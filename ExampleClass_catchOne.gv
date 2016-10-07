@@ -16,16 +16,22 @@ digraph ExampleClass_catchOne {
 	B17:<bottom> -> E:<top> [label=""]
 
 	B5 [
-		label="\(B5\) | { <top> 5: ISTORE 3 |8: GOTO (B17) |11: ASTORE 3 | <bottom> 14: GETSTATIC java/lang/System.out Ljava/io/PrintStream; }"
+		label="\(B5\) | { <top> 5: ISTORE 3 | <bottom> 8: GOTO (B17) }"
 		]
 
-	B5:<bottom> -> B15:<top> [label=""]
+	B5:<bottom> -> B17:<top> [label="T"]
 
 	B21 [
 		label="\(B21\) | { <top>  }"
 		]
 
 	E [label="E", shape=ellipse]
+	B9 [
+		label="\(B9\) | { <top> 11: ASTORE 3 | <bottom> 14: GETSTATIC java/lang/System.out Ljava/io/PrintStream; }"
+		]
+
+	B9:<bottom> -> B15:<top> [label=""]
+
 	B15 [
 		label="\(B15\) | { <top> 15: ALOAD 3 | <bottom> 16: INVOKEVIRTUAL java/io/PrintStream.println (Ljava/lang/Object;)V }"
 		]

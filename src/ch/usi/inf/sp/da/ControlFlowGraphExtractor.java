@@ -100,6 +100,7 @@ public final class ControlFlowGraphExtractor {
 			bbBoundAdrresses.add( i+1 );
 			bbMap.put( i+1, new BasicBlock(i+1) );
 		}else{
+			System.out.println("\t" + instruction.getType());
 			switch (instruction.getType()) {
 	
 				case AbstractInsnNode.JUMP_INSN:
@@ -109,12 +110,11 @@ public final class ControlFlowGraphExtractor {
 				{
 					final LabelNode targetInstruction = ((JumpInsnNode)instruction).label;
 					final int targetId = instructions.indexOf(targetInstruction);
+					System.out.println("\t\t" + targetId);
 					bbBoundAdrresses.add( targetId );
 					bbMap.put( targetId, new BasicBlock(targetId) );
-					if( instruction.getOpcode() != Opcodes.GOTO ){
-						bbBoundAdrresses.add( i+1 );
-						bbMap.put( i+1, new BasicBlock(i+1) );
-					}
+					bbBoundAdrresses.add( i+1 );
+					bbMap.put( i+1, new BasicBlock(i+1) );
 					break;
 				}
 				case AbstractInsnNode.LOOKUPSWITCH_INSN:
@@ -165,6 +165,7 @@ public final class ControlFlowGraphExtractor {
 			}
 			bb.addInstruction( instructions.get(i) );
 		}
+		
 		if(lastSignificantInstruction == null){
 			return; //TO DO: Gestire label post return
 		}
@@ -180,6 +181,7 @@ public final class ControlFlowGraphExtractor {
 			final LabelNode targetInstruction = ((JumpInsnNode)lastSignificantInstruction).label;
 			final int targetId = instructions.indexOf(targetInstruction);
 			bb.addEdge( bbMap.get(targetId), "T" );
+			
 			if( lastSignificantInstruction.getOpcode() != Opcodes.GOTO ){
 				bb.addEdge( bbMap.get(endOfBlock + 1), "F" );
 			}

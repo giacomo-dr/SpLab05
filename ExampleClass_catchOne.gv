@@ -7,35 +7,105 @@ digraph ExampleClass_catchOne {
 		label="\(B0\) | { <top> 2: ILOAD 1 |3: ILOAD 2 | <bottom> 4: IDIV  }"
 		]
 
+	B0:<bottom> -> B23:<top> [style=dotted]
+
 	B0:<bottom> -> B5:<top> [label=""]
 
-	B17 [
-		label="\(B17\) | { <top> 20: RETURN  }"
+	B0:<bottom> -> B9:<top> [style=dotted]
+
+	B32 [
+		label="\(B32\) | { <top> 34: ALOAD 4 | <bottom> 35: ATHROW  }"
 		]
 
-	B17:<bottom> -> E:<top> [label=""]
+	B32:<bottom> -> B36:<top> [label=""]
+
+	B32:<bottom> -> E:<top> [style=dotted]
+
+	B36 [
+		label="\(B36\) | { <top> 39: GETSTATIC java/lang/System.out Ljava/io/PrintStream; }"
+		]
+
+	B36:<bottom> -> E:<top> [style=dotted]
+
+	B36:<bottom> -> B40:<top> [label=""]
 
 	B5 [
-		label="\(B5\) | { <top> 5: ISTORE 3 | <bottom> 8: GOTO (B17) }"
+		label="\(B5\) | { <top> 5: ISTORE 3 | <bottom> 8: GOTO (B36) }"
 		]
 
-	B5:<bottom> -> B17:<top> [label="T"]
+	B5:<bottom> -> B36:<top> [label="T"]
 
-	B21 [
-		label="\(B21\) | { <top>  }"
+	B40 [
+		label="\(B40\) | { <top> 40: LDC a | <bottom> 41: INVOKEVIRTUAL java/io/PrintStream.println (Ljava/lang/String;)V }"
 		]
 
-	E [label="E", shape=ellipse]
+	B40:<bottom> -> B42:<top> [label=""]
+
+	B40:<bottom> -> E:<top> [style=dotted]
+
 	B9 [
 		label="\(B9\) | { <top> 11: ASTORE 3 | <bottom> 14: GETSTATIC java/lang/System.out Ljava/io/PrintStream; }"
 		]
 
+	B9:<bottom> -> B23:<top> [style=dotted]
+
 	B9:<bottom> -> B15:<top> [label=""]
 
+	B42 [
+		label="\(B42\) | { <top> 45: RETURN  }"
+		]
+
+	B42:<bottom> -> E:<top> [label=""]
+
+	B46 [
+		label="\(B46\) | { <top>  }"
+		]
+
+	E [label="E", shape=ellipse]
 	B15 [
 		label="\(B15\) | { <top> 15: ALOAD 3 | <bottom> 16: INVOKEVIRTUAL java/io/PrintStream.println (Ljava/lang/Object;)V }"
 		]
 
+	B15:<bottom> -> B23:<top> [style=dotted]
+
 	B15:<bottom> -> B17:<top> [label=""]
+
+	B17 [
+		label="\(B17\) | { <top> 19: GETSTATIC java/lang/System.out Ljava/io/PrintStream; }"
+		]
+
+	B17:<bottom> -> E:<top> [style=dotted]
+
+	B17:<bottom> -> B20:<top> [label=""]
+
+	B20 [
+		label="\(B20\) | { <top> 20: LDC a | <bottom> 21: INVOKEVIRTUAL java/io/PrintStream.println (Ljava/lang/String;)V }"
+		]
+
+	B20:<bottom> -> B22:<top> [label=""]
+
+	B20:<bottom> -> E:<top> [style=dotted]
+
+	B22 [
+		label="\(B22\) | { <top> 22: GOTO (B42) }"
+		]
+
+	B22:<bottom> -> B42:<top> [label="T"]
+
+	B23 [
+		label="\(B23\) | { <top> 26: ASTORE 4 | <bottom> 29: GETSTATIC java/lang/System.out Ljava/io/PrintStream; }"
+		]
+
+	B23:<bottom> -> B30:<top> [label=""]
+
+	B23:<bottom> -> E:<top> [style=dotted]
+
+	B30 [
+		label="\(B30\) | { <top> 30: LDC a | <bottom> 31: INVOKEVIRTUAL java/io/PrintStream.println (Ljava/lang/String;)V }"
+		]
+
+	B30:<bottom> -> E:<top> [style=dotted]
+
+	B30:<bottom> -> B32:<top> [label=""]
 
 }

@@ -302,4 +302,13 @@ public class ExampleClass {
 	    }
 	}
 	
+	void tryFinally(int a, int b) {
+	    try {
+	        int c = a/b;
+	    } finally {
+	        int d = a+b;
+	    }
+	    int e = a-b;
+	}
+	
 }

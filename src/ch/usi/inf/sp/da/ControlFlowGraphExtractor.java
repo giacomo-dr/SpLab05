@@ -21,6 +21,7 @@ import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.LookupSwitchInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TableSwitchInsnNode;
+import org.objectweb.asm.tree.TryCatchBlockNode;
 
 import ch.usi.inf.sp.cfg.JavaClassDisassembler;
 
@@ -55,12 +56,14 @@ public final class ControlFlowGraphExtractor {
 		bbBoundAdrresses.add( 0 );           // Start of the first basic block
 		bbMap.put( 0, new BasicBlock(0) );   // First basic block
 		final InsnList instructions = method.instructions;
+		bbMap.put( instructions.size(), new BasicBlock(-2) ); // Dummy "end" basic block
+		bbBoundAdrresses.add( instructions.size() );          // End of the last basic block + 1
 		for( int i=0; i<instructions.size(); i++ ){
 			final AbstractInsnNode instruction = instructions.get(i);
 			extractAdrresses( instruction, i, instructions );
 		}
-		bbBoundAdrresses.add( instructions.size() );          // End of the last basic block + 1
-		bbMap.put( instructions.size(), new BasicBlock(-2) ); // Dummy "end" basic block 
+		
+		
 		
 		for(int i: bbBoundAdrresses){
 			System.out.println(i);
@@ -74,7 +77,7 @@ public final class ControlFlowGraphExtractor {
 			System.out.println(startOfBlock);
 			BasicBlock bb = bbMap.get(startOfBlock);
 			int endOfBlock = it.next() - 1;
-			populateBasicBlock( bb, startOfBlock, endOfBlock, instructions );
+			populateBasicBlock( bb, startOfBlock, endOfBlock, instructions, method.tryCatchBlocks);
 			startOfBlock = endOfBlock + 1;
 		}
 		
@@ -155,7 +158,7 @@ public final class ControlFlowGraphExtractor {
 	}
 	
 	void populateBasicBlock( BasicBlock bb, int startOfBlock, 
-			int endOfBlock, InsnList instructions ){
+			int endOfBlock, InsnList instructions, List<TryCatchBlockNode> tryCatchBlocks){
 		AbstractInsnNode lastSignificantInstruction = null;
 		
 		// Add mnemonic instructions
@@ -168,6 +171,28 @@ public final class ControlFlowGraphExtractor {
 		
 		if(lastSignificantInstruction == null){
 			return; //TO DO: Gestire label post return
+		}
+		
+		// Add exception edges 
+		if (isPEI(lastSignificantInstruction)){
+			boolean isFinally = false;
+			final int instNumber = instructions.indexOf(lastSignificantInstruction);
+			for(TryCatchBlockNode block: tryCatchBlocks){
+				final int start = instructions.indexOf(block.start); 
+				final int end = instructions.indexOf(block.end);
+				final int handler = instructions.indexOf(block.handler);
+				if(instNumber>=start && instNumber<end){
+					bb.addEdge( bbMap.get(handler), "ex" );
+					System.out.println(end + " " + block.type);
+					if(block.type == null){
+						isFinally=true;
+						break;
+					}
+				}
+			}
+			if(!isFinally){
+				bb.addEdge( bbMap.get(instructions.size()), "ex" );
+			}
 		}
 		
 		// Add outgoing edges
@@ -230,11 +255,13 @@ public final class ControlFlowGraphExtractor {
 				// Chain the return blocks with the "end" dummy basic block
 				bb.addEdge( bbMap.get( instructions.size() ), "" );
 			} else {
-				if( endOfBlock != instructions.size() -1 ) // Don't chain last line
+				if( endOfBlock != instructions.size() -1 && // Don't chain last line
+					lastSignificantInstruction.getOpcode() != Opcodes.ATHROW ) // Exception 
 					bb.addEdge( bbMap.get(endOfBlock + 1), "" );
 			}
 			break;
 		}
+		
 		default:
 			if( endOfBlock != instructions.size() -1 ){
 				// Don't chain last line

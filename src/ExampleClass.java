@@ -260,8 +260,6 @@ public class ExampleClass {
 		return new int[][] {{1}};
 	}
 	
-	
-	
 	//--- more conditionals
 	public int condMethod(int a, int b) {
 		return a>b?a:b;
@@ -281,4 +279,10 @@ public class ExampleClass {
 		return 0;
 	}
 	
+	//--- Exceptions
+	public void exception01(int i) throws IllegalArgumentException {
+	    if (i == 0) {
+	        throw new IllegalArgumentException();
+	    }
+	}
 }

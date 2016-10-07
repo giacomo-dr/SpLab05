@@ -55,9 +55,9 @@ public class DotFileCreator {
 		Iterator<BasicBlock> bbIterator = cfg.getBasicBlocks();
 		while( bbIterator.hasNext() ){
 			BasicBlock bb = bbIterator.next();
-//			if(bb.getEdgesLenght()==0){
-//				continue;
-//			}
+			if( bb.getBBAddress() != -2 && bb.getEdgesLenght()==0 ){
+				continue;
+			}
 			printDotNode( bb );
 			printEdges( bb );
 		}

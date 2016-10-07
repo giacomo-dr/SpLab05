@@ -285,4 +285,21 @@ public class ExampleClass {
 	        throw new IllegalArgumentException();
 	    }
 	}
+	
+	public int division(int a, int b){
+		return a/b;
+	}
+	
+	public void getField(Object a){
+		a.getClass();
+	}
+	
+	void catchOne(int a, int b){
+	    try {
+	        int c = a/b;
+	    } catch (Exception e) {
+	        System.out.println(e);
+	    }
+	}
+	
 }

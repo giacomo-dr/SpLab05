@@ -1,0 +1,23 @@
+digraph ExampleClass_division {
+	node [shape=record]
+	S [label="S", shape=ellipse]
+	S:<bottom> -> B0:<top> [label=""]
+
+	B0 [
+		label="\(B0\) | { <top> 2: ILOAD 1 |3: ILOAD 2 | <bottom> 4: IDIV  }"
+		]
+
+	B0:<bottom> -> B5:<top> [label=""]
+
+	B5 [
+		label="\(B5\) | { <top> 5: IRETURN  }"
+		]
+
+	B5:<bottom> -> E:<top> [label=""]
+
+	B6 [
+		label="\(B6\) | { <top>  }"
+		]
+
+	E [label="E", shape=ellipse]
+}

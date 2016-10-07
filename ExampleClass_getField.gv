@@ -1,0 +1,23 @@
+digraph ExampleClass_getField {
+	node [shape=record]
+	S [label="S", shape=ellipse]
+	S:<bottom> -> B0:<top> [label=""]
+
+	B0 [
+		label="\(B0\) | { <top> 2: ALOAD 1 | <bottom> 3: INVOKEVIRTUAL java/lang/Object.getClass ()Ljava/lang/Class; }"
+		]
+
+	B0:<bottom> -> B4:<top> [label=""]
+
+	B4 [
+		label="\(B4\) | { <top> 4: POP  | <bottom> 7: RETURN  }"
+		]
+
+	B4:<bottom> -> E:<top> [label=""]
+
+	B8 [
+		label="\(B8\) | { <top>  }"
+		]
+
+	E [label="E", shape=ellipse]
+}

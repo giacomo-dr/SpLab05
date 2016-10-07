@@ -22,6 +22,8 @@ import org.objectweb.asm.tree.LookupSwitchInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TableSwitchInsnNode;
 
+import ch.usi.inf.sp.cfg.JavaClassDisassembler;
+
 /**
  * This class extracts a control flow graph in .dot format
  * from the byte code of a Java method.
@@ -44,6 +46,10 @@ public final class ControlFlowGraphExtractor {
 	 * @return
 	 */
 	public ControlFlowGraph createCFG( String className, MethodNode method ){
+		System.out.println(method.name);
+		final JavaClassDisassembler dumper = new JavaClassDisassembler();
+		dumper.disassembleMethod(method);
+		
 		// Get basic blocks bounds and create BasicBlock objects
 		bbMap.put( -1, new BasicBlock(-1) ); // Dummy "start" basic block 
 		bbBoundAdrresses.add( 0 );           // Start of the first basic block
@@ -56,10 +62,16 @@ public final class ControlFlowGraphExtractor {
 		bbBoundAdrresses.add( instructions.size() );          // End of the last basic block + 1
 		bbMap.put( instructions.size(), new BasicBlock(-2) ); // Dummy "end" basic block 
 		
+		for(int i: bbBoundAdrresses){
+			System.out.println(i);
+		}
+		System.out.println("------------------");
+		
 		// Fill BasicBlocks with instructions and add edges
 		Iterator<Integer> it = bbBoundAdrresses.iterator();
 		int startOfBlock = it.next(); 
 		while( it.hasNext() ){
+			System.out.println(startOfBlock);
 			BasicBlock bb = bbMap.get(startOfBlock);
 			int endOfBlock = it.next() - 1;
 			populateBasicBlock( bb, startOfBlock, endOfBlock, instructions );
@@ -83,56 +95,62 @@ public final class ControlFlowGraphExtractor {
 	 * @param instructions
 	 */
 	public void extractAdrresses( AbstractInsnNode instruction, int i, InsnList instructions){
-		switch (instruction.getType()) {
-
-		case AbstractInsnNode.JUMP_INSN:
-			// Opcodes: IFEQ, IFNE, IFLT, IFGE, IFGT, IFLE, IF_ICMPEQ,
-		    // IF_ICMPNE, IF_ICMPLT, IF_ICMPGE, IF_ICMPGT, IF_ICMPLE, IF_ACMPEQ,
-		    // IF_ACMPNE, GOTO, JSR, IFNULL or IFNONNULL.
-		{
-			final LabelNode targetInstruction = ((JumpInsnNode)instruction).label;
-			final int targetId = instructions.indexOf(targetInstruction);
-			bbBoundAdrresses.add( targetId );
-			bbMap.put( targetId, new BasicBlock(targetId) );
-			if( instruction.getOpcode() != Opcodes.GOTO ){
-				bbBoundAdrresses.add( i+1 );
-				bbMap.put( i+1, new BasicBlock(i+1) );
+		
+		if (isPEI(instruction)){
+			bbBoundAdrresses.add( i+1 );
+			bbMap.put( i+1, new BasicBlock(i+1) );
+		}else{
+			switch (instruction.getType()) {
+	
+				case AbstractInsnNode.JUMP_INSN:
+					// Opcodes: IFEQ, IFNE, IFLT, IFGE, IFGT, IFLE, IF_ICMPEQ,
+				    // IF_ICMPNE, IF_ICMPLT, IF_ICMPGE, IF_ICMPGT, IF_ICMPLE, IF_ACMPEQ,
+				    // IF_ACMPNE, GOTO, JSR, IFNULL or IFNONNULL.
+				{
+					final LabelNode targetInstruction = ((JumpInsnNode)instruction).label;
+					final int targetId = instructions.indexOf(targetInstruction);
+					bbBoundAdrresses.add( targetId );
+					bbMap.put( targetId, new BasicBlock(targetId) );
+					if( instruction.getOpcode() != Opcodes.GOTO ){
+						bbBoundAdrresses.add( i+1 );
+						bbMap.put( i+1, new BasicBlock(i+1) );
+					}
+					break;
+				}
+				case AbstractInsnNode.LOOKUPSWITCH_INSN:
+					// Opcodes: LOOKUPSWITCH.
+				{
+					final List<?> labels = ((LookupSwitchInsnNode)instruction).labels;
+					for (int t=0; t<labels.size(); t++) {
+						final LabelNode targetInstruction = (LabelNode)labels.get(t);
+						final int targetId = instructions.indexOf(targetInstruction);
+						bbBoundAdrresses.add( targetId );
+						bbMap.put( targetId, new BasicBlock(targetId) );
+					}
+					final LabelNode defaultTargetInstruction = ((LookupSwitchInsnNode)instruction).dflt;
+					final int defaultTargetId = instructions.indexOf(defaultTargetInstruction);
+					bbBoundAdrresses.add( defaultTargetId );
+					bbMap.put( defaultTargetId, new BasicBlock(defaultTargetId) );
+					// bbBoundAdrresses.add( i+1 );
+					break;
+				}
+				case AbstractInsnNode.TABLESWITCH_INSN:
+					// Opcodes: TABLESWITCH.
+				{
+					final List<?> labels = ((TableSwitchInsnNode)instruction).labels;
+					for( int t=0; t<labels.size(); t++ ){
+						final LabelNode targetInstruction = (LabelNode)labels.get(t);
+						final int targetId = instructions.indexOf(targetInstruction);
+						bbBoundAdrresses.add( targetId );
+						bbMap.put( targetId, new BasicBlock(targetId) );
+					}
+					final LabelNode defaultTargetInstruction = ((TableSwitchInsnNode)instruction).dflt;
+					final int defaultTargetId = instructions.indexOf(defaultTargetInstruction);
+					bbBoundAdrresses.add( defaultTargetId );
+					bbMap.put( defaultTargetId, new BasicBlock(defaultTargetId) );
+					break;
+				}
 			}
-			break;
-		}
-		case AbstractInsnNode.LOOKUPSWITCH_INSN:
-			// Opcodes: LOOKUPSWITCH.
-		{
-			final List<?> labels = ((LookupSwitchInsnNode)instruction).labels;
-			for (int t=0; t<labels.size(); t++) {
-				final LabelNode targetInstruction = (LabelNode)labels.get(t);
-				final int targetId = instructions.indexOf(targetInstruction);
-				bbBoundAdrresses.add( targetId );
-				bbMap.put( targetId, new BasicBlock(targetId) );
-			}
-			final LabelNode defaultTargetInstruction = ((LookupSwitchInsnNode)instruction).dflt;
-			final int defaultTargetId = instructions.indexOf(defaultTargetInstruction);
-			bbBoundAdrresses.add( defaultTargetId );
-			bbMap.put( defaultTargetId, new BasicBlock(defaultTargetId) );
-			// bbBoundAdrresses.add( i+1 );
-			break;
-		}
-		case AbstractInsnNode.TABLESWITCH_INSN:
-			// Opcodes: TABLESWITCH.
-		{
-			final List<?> labels = ((TableSwitchInsnNode)instruction).labels;
-			for( int t=0; t<labels.size(); t++ ){
-				final LabelNode targetInstruction = (LabelNode)labels.get(t);
-				final int targetId = instructions.indexOf(targetInstruction);
-				bbBoundAdrresses.add( targetId );
-				bbMap.put( targetId, new BasicBlock(targetId) );
-			}
-			final LabelNode defaultTargetInstruction = ((TableSwitchInsnNode)instruction).dflt;
-			final int defaultTargetId = instructions.indexOf(defaultTargetInstruction);
-			bbBoundAdrresses.add( defaultTargetId );
-			bbMap.put( defaultTargetId, new BasicBlock(defaultTargetId) );
-			break;
-		}
 		}		
 	}
 	
@@ -146,6 +164,9 @@ public final class ControlFlowGraphExtractor {
 				lastSignificantInstruction = instructions.get(i);
 			}
 			bb.addInstruction( instructions.get(i) );
+		}
+		if(lastSignificantInstruction == null){
+			return; //TO DO: Gestire label post return
 		}
 		
 		// Add outgoing edges
@@ -288,6 +309,8 @@ public final class ControlFlowGraphExtractor {
 		DotFileCreator dotCreator = new DotFileCreator( graph, 
 				method.instructions, clazz.name + "_" + method.name );
 		dotCreator.generate();
+		
+		
 	}
 
 	public static MethodNode findMethod( List<MethodNode> methodList, String name ){

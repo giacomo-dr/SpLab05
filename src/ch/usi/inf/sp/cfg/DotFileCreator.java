@@ -1,4 +1,4 @@
-package ch.usi.inf.sp.da;
+package ch.usi.inf.sp.cfg;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -23,6 +23,12 @@ import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 import org.objectweb.asm.util.Printer;
 
+/**
+ * Make a graphical representation of a Control Flow Graph using
+ * the graphviz dot file format.
+ * 
+ * @author Eric Botter, Lorenzo Ferretti, Giacomo Del Rio
+ */
 public class DotFileCreator {
 	
 	ControlFlowGraph cfg;

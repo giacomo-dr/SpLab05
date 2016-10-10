@@ -6,6 +6,7 @@ import java.util.Set;
  * Java disassemblers and control-flow graph generators.
  * 
  * @author Matthias.Hauswirth@usi.ch
+ * Edited: Eric Botter, Lorenzo Ferretti, Giacomo Del Rio
  */
 public class ExampleClass {
 	

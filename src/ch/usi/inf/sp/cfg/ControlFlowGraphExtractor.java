@@ -1,4 +1,4 @@
-package ch.usi.inf.sp.da;
+package ch.usi.inf.sp.cfg;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -23,8 +23,6 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TableSwitchInsnNode;
 import org.objectweb.asm.tree.TryCatchBlockNode;
 
-import ch.usi.inf.sp.cfg.JavaClassDisassembler;
-
 /**
  * This class extracts a control flow graph in .dot format
  * from the byte code of a Java method.
@@ -46,10 +44,11 @@ public final class ControlFlowGraphExtractor {
 	 * @param method
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	public ControlFlowGraph createCFG( String className, MethodNode method ){
-		System.out.println(method.name);
-		final JavaClassDisassembler dumper = new JavaClassDisassembler();
-		dumper.disassembleMethod(method);
+		//System.out.println(method.name);
+		//final JavaClassDisassembler dumper = new JavaClassDisassembler();
+		//dumper.disassembleMethod(method);
 		
 		// Get basic blocks bounds and create BasicBlock objects
 		bbMap.put( -1, new BasicBlock(-1) ); // Dummy "start" basic block 
@@ -63,18 +62,10 @@ public final class ControlFlowGraphExtractor {
 			extractAdrresses( instruction, i, instructions );
 		}
 		
-		
-		
-		for(int i: bbBoundAdrresses){
-			System.out.println(i);
-		}
-		System.out.println("------------------");
-		
 		// Fill BasicBlocks with instructions and add edges
 		Iterator<Integer> it = bbBoundAdrresses.iterator();
 		int startOfBlock = it.next(); 
 		while( it.hasNext() ){
-			System.out.println(startOfBlock);
 			BasicBlock bb = bbMap.get(startOfBlock);
 			int endOfBlock = it.next() - 1;
 			populateBasicBlock( bb, startOfBlock, endOfBlock, instructions, method.tryCatchBlocks);
@@ -103,7 +94,6 @@ public final class ControlFlowGraphExtractor {
 			bbBoundAdrresses.add( i+1 );
 			bbMap.put( i+1, new BasicBlock(i+1) );
 		}else{
-			System.out.println("\t" + instruction.getType());
 			switch (instruction.getType()) {
 	
 				case AbstractInsnNode.JUMP_INSN:
@@ -113,7 +103,6 @@ public final class ControlFlowGraphExtractor {
 				{
 					final LabelNode targetInstruction = ((JumpInsnNode)instruction).label;
 					final int targetId = instructions.indexOf(targetInstruction);
-					System.out.println("\t\t" + targetId);
 					bbBoundAdrresses.add( targetId );
 					bbMap.put( targetId, new BasicBlock(targetId) );
 					bbBoundAdrresses.add( i+1 );
@@ -183,7 +172,6 @@ public final class ControlFlowGraphExtractor {
 				final int handler = instructions.indexOf(block.handler);
 				if(instNumber>=start && instNumber<end){
 					bb.addEdge( bbMap.get(handler), "ex" );
-					System.out.println(end + " " + block.type);
 					if(block.type == null){
 						isFinally=true;
 						break;

@@ -1,4 +1,4 @@
-package ch.usi.inf.sp.da;
+package ch.usi.inf.sp.cfg;
 
 import java.util.Iterator;
 import java.util.List;

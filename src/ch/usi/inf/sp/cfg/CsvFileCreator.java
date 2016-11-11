@@ -17,7 +17,7 @@ public class CsvFileCreator {
 		out.write(cfg.getClassName() + ",");
 		out.write(cfg.getMethodName() + ",");
 		out.write(kind + ",");
-		out.write(instructionsCount+ ",");
+		out.write(instructionsCount+ ","); 
 		out.write(cfg.getBasicBlockCount() + ",");
 		
 		out.close();

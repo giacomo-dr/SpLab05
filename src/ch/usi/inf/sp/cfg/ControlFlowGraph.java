@@ -34,5 +34,5 @@ public class ControlFlowGraph {
 	
 	public int getBasicBlockCount(){
 		return bbList.size();
-	}
+	} 
 }

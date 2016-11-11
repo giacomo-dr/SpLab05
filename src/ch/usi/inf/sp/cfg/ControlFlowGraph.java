@@ -31,4 +31,8 @@ public class ControlFlowGraph {
 	public Iterator<BasicBlock> getBasicBlocks(){
 		return bbList.iterator();
 	}
+	
+	public int getBasicBlockCount(){
+		return bbList.size();
+	}
 }

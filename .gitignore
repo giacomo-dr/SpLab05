@@ -1,2 +1,4 @@
 /bin/
 /graph.pdf
+/*.gv
+/graph.dot

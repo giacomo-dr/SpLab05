@@ -1,7 +1,6 @@
 package ch.usi.inf.sp.cfg;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -310,7 +309,7 @@ public final class ControlFlowGraphExtractor {
 		return false;
 	}
 
-	public static void main(final String[] args) throws FileNotFoundException, IOException {
+	public static void main(final String[] args) throws IOException {
 		final String classFileName = args[0];
 		final String methodNameAndDescriptor = args[1];
 		
@@ -326,8 +325,22 @@ public final class ControlFlowGraphExtractor {
 		DotFileCreator dotCreator = new DotFileCreator( graph, 
 				method.instructions, clazz.name + "_" + method.name );
 		dotCreator.generate();
-		
-		
+	}
+
+	public static void analyzeClassReader(ClassReader cr) throws IOException {
+		final ClassNode clazz = new ClassNode();
+		cr.accept(clazz, 0);
+
+		for( int m = 0; m < clazz.methods.size(); m++ ){
+			@SuppressWarnings("unchecked")
+			final MethodNode method = ((List<MethodNode>)clazz.methods).get(m);
+            ControlFlowGraphExtractor cfgExt = new ControlFlowGraphExtractor();
+            ControlFlowGraph graph = cfgExt.createCFG( clazz.name, method );
+
+            DotFileCreator dotCreator = new DotFileCreator( graph,
+                    method.instructions, clazz.name + "_" + method.name );
+            dotCreator.generate();
+		}
 	}
 
 	public static MethodNode findMethod( List<MethodNode> methodList, String name ){

@@ -2,3 +2,5 @@
 /graph.pdf
 /*.gv
 /graph.dot
+.idea/
+CFGExceptions.iml

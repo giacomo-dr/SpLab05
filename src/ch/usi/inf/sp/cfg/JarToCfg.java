@@ -19,9 +19,11 @@ public class JarToCfg {
             if (!entry.isDirectory() && entry.getName().endsWith(".class")) {
                 System.out.println(entry.getName());
                 final InputStream is = jar.getInputStream(entry);
-                ControlFlowGraphExtractor.analyzeClassReader(new ClassReader(is));
+                ControlFlowGraphExtractor.analyzeClassReader(new ClassReader(is), 
+                		jarFileName.substring(jarFileName.lastIndexOf('/')+1));
             }
         }
+        jar.close();
     }
 
 }

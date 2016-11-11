@@ -300,6 +300,8 @@ public class ExampleClass {
 	        int c = a/b;
 	    } catch (Exception e) {
 	        System.out.println(e);
+	    }finally{
+	    	int c = 7;
 	    }
 	}
 	

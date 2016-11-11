@@ -21,6 +21,7 @@ import org.objectweb.asm.tree.LookupSwitchInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TableSwitchInsnNode;
 import org.objectweb.asm.tree.TryCatchBlockNode;
+import org.objectweb.asm.util.Printer;
 
 /**
  * This class extracts a control flow graph in .dot format
@@ -327,7 +328,7 @@ public final class ControlFlowGraphExtractor {
 		dotCreator.generate();
 	}
 
-	public static void analyzeClassReader(ClassReader cr) throws IOException {
+	public static void analyzeClassReader(ClassReader cr, String jarfile) throws IOException {
 		final ClassNode clazz = new ClassNode();
 		cr.accept(clazz, 0);
 
@@ -337,9 +338,9 @@ public final class ControlFlowGraphExtractor {
             ControlFlowGraphExtractor cfgExt = new ControlFlowGraphExtractor();
             ControlFlowGraph graph = cfgExt.createCFG( clazz.name, method );
 
-            DotFileCreator dotCreator = new DotFileCreator( graph,
-                    method.instructions, clazz.name + "_" + method.name );
-            dotCreator.generate();
+            String packageName = clazz.name.substring(0, clazz.name.lastIndexOf('/'));
+            CsvFileCreator.writeCsvStatistics(jarfile, packageName, graph, 
+            	 	method.access, method.instructions.size());
 		}
 	}
 
